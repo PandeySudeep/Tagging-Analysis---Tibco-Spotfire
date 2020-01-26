@@ -1,4 +1,4 @@
-# Tagging-Analysis-in-Tibco-Spotfire-via-Python
+# Tagging Analysis in Tibco Spotfire via Python
 User Interaction can be customized via Python by tagging and untagging columns in data table.
 
 Background

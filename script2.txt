@@ -1,0 +1,66 @@
+import sys
+from Spotfire.Dxp.Data import IndexSet, RowSelection, DataValueCursor, DataSelection, DataColumn, TagsColumn
+from System.Collections.Generic import *
+from Spotfire.Dxp.Data import *
+from Spotfire.Dxp.Application import Filters as filters
+
+Document.Properties['SelectedCOIds'] = "0"
+Document.Properties['SelectedCOAIds'] = "0"
+Document.Properties['SelectedBusRef'] = "0"
+Document.Properties['SelectedSeg1'] = "0"
+Document.Properties['SelectedSeg2'] = "0"
+Document.Properties['SelectedFiscalCode'] = "0"
+Document.Properties['SelectedSourceRef'] = "0"
+Document.Properties['SelectedSysMan'] = "0"
+Document.Properties['SelectedPreparer'] = "0"
+
+
+rowCount = activeTable.RowCount
+colName = "Cash Flow"
+
+myPanel = Document.ActivePageReference.FilterPanel
+
+rowsToInclude2 = IndexSet(rowCount,True)
+unmarkrows = IndexSet(rowCount,False)
+selectionEnum2 = DataSelectionOperation.Replace
+
+rowSelection = Document.ActiveFilteringSelectionReference.GetSelection(activeTable)
+Document.Data.Markings["Remove"].SetSelection(rowSelection,activeTable)
+			
+col=activeTable.Columns[colName]
+tagCol=col.As[TagsColumn]()
+
+#Retrieve marked rows in collection
+markedRows2 = Document.Data.Markings["Remove"].GetSelection(activeTable)
+
+#Tag Marked rows aith tag "1"
+tagCol.Tag('Untagged', markedRows2)
+
+Document.Data.Markings["Remove"].SetSelection(RowSelection(unmarkrows),activeTable)
+Document.Data.Markings["Cash Groups by Source"].SetSelection(RowSelection(unmarkrows),activeTable)
+Document.Data.Markings["Cash related group activity rollforward"].SetSelection(RowSelection(unmarkrows),activeTable)
+Document.Data.Markings["Details of selected journal entries"].SetSelection(RowSelection(unmarkrows),activeTable)
+
+Document.Properties['SelectedCOIds'] = "0"
+Document.Properties['lblNotice'] = ""
+
+for col in activeTable.Columns:
+  myFilter= myPanel.TableGroups[0].GetFilter(col.Name)
+  if str(myFilter) != 'None':
+    myFilter.FilterReference.Reset()
+
+
+
+#for eachTGroup in Document.ActivePageReference.FilterPanel.TableGroups:
+#  for eachSubGroup in eachTGroup.SubGroups:
+#    for eachFilter in eachSubGroup.Items:
+#      eachFilter.FilterReference.Reset()
+
+
+for visual in Document.ActivePageReference.Visuals: 
+  if visual.Title == "Primary correlation group : Assigned":
+    visual.Title = "Primary correlation group"
+
+myTable=Application.Document.Data.Tables[TableToRefresh.Name]
+if myTable.IsRefreshable:
+  myTable.Refresh()

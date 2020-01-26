@@ -1,0 +1,45 @@
+import sys
+from Spotfire.Dxp.Data import IndexSet, RowSelection, DataValueCursor, DataSelection, DataColumn, TagsColumn
+from System.Collections.Generic import *
+from Spotfire.Dxp.Data import *
+from Spotfire.Dxp.Application import Filters as filters
+from Spotfire.Dxp.Application.Visuals import VisualTypeIdentifiers
+
+Document.Properties['SelectedCOIds'] = ""
+Document.Properties['lblNotice'] = ""
+rowCount = activeTable.RowCount
+tagValues = List[str]() 
+tagValues2 = List[str]()
+colName = "Cash Flow"
+
+unmarkrows = IndexSet(rowCount,False)
+selectionEnum2 = DataSelectionOperation.Replace
+  
+rowSelection = Document.ActiveFilteringSelectionReference.GetSelection(activeTable)
+Document.Data.Markings["Remove"].SetSelection(rowSelection,activeTable)
+
+for tagvalues2 in [GroupA, "Untagged"]:
+  tagValues2.Add(tagvalues2)
+
+if activeTable.Columns.Contains(colName) <> True:
+  activeTable.Columns.AddTagsColumn(colName, tagValues2)
+else:
+  col=activeTable.Columns[colName]
+  tagCol=col.As[TagsColumn]()
+  tagCol.TagValues = tagValues2
+
+#Retrieve marked rows in collection
+markedRows2 = Document.Data.Markings["Remove"].GetSelection(activeTable)
+
+col=activeTable.Columns[colName]
+tagCol=col.As[TagsColumn]()
+
+#Tag Marked rows aith tag "1"
+tagCol.Tag(GroupA, markedRows2)
+
+for col in activeTable.Columns:
+  myFilter= Document.ActivePageReference.FilterPanel.TableGroups[0].GetFilter(col.Name)
+  if str(myFilter) != 'None':
+    myFilter.FilterReference.Reset()
+
+Document.Data.Markings["Remove"].SetSelection(RowSelection(unmarkrows),activeTable)
